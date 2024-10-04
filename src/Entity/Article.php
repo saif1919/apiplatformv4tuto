@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -13,12 +14,15 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
+// #[ApiResource(
+//     paginationEnabled: false
+// )]
 #[Get()]
 #[GetCollection(
     // paginationEnabled: false
     // paginationItemsPerPage: 20,
-    paginationClientEnabled: true,
-    paginationClientItemsPerPage: true,
+    // paginationClientEnabled: true,
+    // paginationClientItemsPerPage: true,
     uriTemplate: '/getarticle',
     name: 'getarticle'
 )]
