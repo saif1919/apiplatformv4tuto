@@ -12,35 +12,54 @@ use ApiPlatform\Metadata\Put;
 use App\Repository\ArticleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
+//Les options dans ApiResource sauf les methodes HTTP (GET,POST,PUT,PATCH,DELETE)
+//sont appliquées sur toutes les methodes
 // #[ApiResource(
-//     paginationEnabled: false
+//     paginationEnabled: false,
+//     denormalizationContext: ['groups' => ['write']],
+//     normalizationContext: ['groups' => ['read']]
 // )]
-#[Get()]
+
+// #[GetCollection(
+//     paginationEnabled: false
+//     paginationItemsPerPage: 20,
+//     paginationClientEnabled: true,
+//     paginationClientItemsPerPage: true,
+//     uriTemplate: '/getarticle',
+//     name: 'getarticle'
+// )]
+// #[GetCollection(
+//     uriTemplate: '/getarticle1',
+//     name: 'getarticle1'
+// )]
+
+// #[GetCollection(
+//     uriTemplate: '/getarticle2',
+//     name: 'getarticle2'
+// )]
+
 #[GetCollection(
-    // paginationEnabled: false
-    // paginationItemsPerPage: 20,
-    // paginationClientEnabled: true,
-    // paginationClientItemsPerPage: true,
-    uriTemplate: '/getarticle',
-    name: 'getarticle'
+    normalizationContext: ['groups' => ['read']]
 )]
-#[GetCollection(
-    uriTemplate: '/getarticle2',
-    name: 'getarticle2'
+#[Post(
+    denormalizationContext: ['groups' => ['write']],
+    normalizationContext: ['groups' => ['read']]
 )]
-#[GetCollection()]
-#[Post()]
 #[Put()]
 #[Patch()]
 #[Delete()]
+#[Get()]
+
 class Article
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -53,16 +72,23 @@ class Article
         minMessage: 'Your first name must be at least {{ limit }} characters long',
         maxMessage: 'Your first name cannot be longer than {{ limit }} characters',
     )]
+    #[Groups(['read','write'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(
         message: 'not blank'
     )]
+    #[Groups(['read', 'write'])]
     private ?string $content = null;
 
     #[ORM\Column]
+    #[Groups([ 'write'])]
     private ?\DateTimeImmutable $publishedAt = null;
+
+    #[ORM\ManyToOne(inversedBy: 'article')]
+    #[Groups(['read'])]
+    private ?Author $author = null;
 
     public function getId(): ?int
     {
@@ -101,6 +127,18 @@ class Article
     public function setPublishedAt(\DateTimeImmutable $publishedAt): static
     {
         $this->publishedAt = $publishedAt;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?Author
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?Author $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }
