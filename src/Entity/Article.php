@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -39,7 +42,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 // #[GetCollection(
 //     uriTemplate: '/getarticle2',
-//     name: 'getarticle2'
+//     name: 'getarticle2',
+//     filters: ['article.serach_filter']
 // )]
 
 #[GetCollection(
@@ -53,6 +57,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Patch()]
 #[Delete()]
 #[Get()]
+// #[ApiFilter(SearchFilter::class, properties: ['title' => 'partial', 'content' => 'exact'])]
 
 class Article
 {
@@ -73,6 +78,8 @@ class Article
         maxMessage: 'Your first name cannot be longer than {{ limit }} characters',
     )]
     #[Groups(['read','write'])]
+    // #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    // #[ApiFilter(OrderFilter::class)]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -88,6 +95,7 @@ class Article
 
     #[ORM\ManyToOne(inversedBy: 'article')]
     #[Groups(['read'])]
+    #[ApiFilter(SearchFilter::class, properties:['author.firstName' => 'partial'])]
     private ?Author $author = null;
 
     public function getId(): ?int
