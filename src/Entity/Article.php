@@ -13,6 +13,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\ArticleRepository;
+use App\State\CustomGetCollectionProvider;
+use App\State\CustomGetProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -40,11 +42,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 //     name: 'getarticle1'
 // )]
 
-// #[GetCollection(
-//     uriTemplate: '/getarticle2',
-//     name: 'getarticle2',
-//     filters: ['article.serach_filter']
-// )]
+#[GetCollection(
+    uriTemplate: '/getarticle2',
+    name: 'getarticle2',
+    filters: ['article.serach_filter'],
+    provider: CustomGetCollectionProvider::class
+)]
 
 #[GetCollection(
     normalizationContext: ['groups' => ['read']]
